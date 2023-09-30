@@ -1,0 +1,70 @@
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class BouncingBallApplet extends Applet implements MouseListener, Runnable {
+    private int ballX, ballY;       // Ball's current position
+    private int ballRadius = 20;    // Ball's radius
+    private int dx = 2, dy = 2;     // Ball's direction and speed
+    private Thread animationThread; // Thread for animation
+    private boolean isRunning = false;
+
+    public void init() {
+        setSize(400, 400);
+        setBackground(Color.white);
+        addMouseListener(this);
+    }
+
+    public void mouseClicked(MouseEvent e) {}
+
+    public void mouseEntered(MouseEvent e) {}
+
+    public void mouseExited(MouseEvent e) {}
+
+    public void mousePressed(MouseEvent e) {
+        if (!isRunning) {
+            ballX = e.getX();
+            ballY = e.getY();
+            isRunning = true;
+            animationThread = new Thread(this);
+            animationThread.start();
+        }
+    }
+
+    public void mouseReleased(MouseEvent e) {}
+
+    public void paint(Graphics g) {
+        g.setColor(Color.blue);
+        g.fillOval(ballX - ballRadius, ballY - ballRadius, 2 * ballRadius, 2 * ballRadius);
+    }
+
+    public void run() {
+        while (isRunning) {
+            // Update ball's position
+            ballX += dx;
+            ballY += dy;
+
+            // Check for collision with the edges
+            if (ballX - ballRadius < 0 || ballX + ballRadius > getWidth()) {
+                dx = -dx; // Reverse the horizontal direction
+            }
+            if (ballY - ballRadius < 0 || ballY + ballRadius > getHeight()) {
+                dy = -dy; // Reverse the vertical direction
+            }
+
+            // Repaint the applet
+            repaint();
+
+            // Pause for a moment to control animation speed
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void stop() {
+        isRunning = false;
+    }
+}
